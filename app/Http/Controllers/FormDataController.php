@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FormData;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class FormDataController extends Controller
 {
@@ -16,11 +17,16 @@ class FormDataController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name'=>'required|string|max:20',
-            'email'=>'required|Email|max:30',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:20',
+            'email' => 'required|email|max:30',
             'message'=>'required|string|max:50'
         ]);
+        if($validator->fails()){
+            return response()->json([
+            $validator -> getMessageBag()->getMessages()
+            ], 400);
+        }    
 
         $form = new FormData;
         $form->name = $request->name;
